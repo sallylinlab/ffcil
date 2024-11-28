@@ -1,5 +1,5 @@
 # FFCIL
-Code release for FFCIL: Fine-grained Few-shot Class Incremental Learning
+This repository contains the code release for the FFCIL paper titled Fine-grained Few-shot Class Incremental Learning with Destruction-construction Integration for Electronic Display Defect Detection [link].
 
 # Environment
 A conda environment named auofscil can be created with the following command:
@@ -7,43 +7,22 @@ A conda environment named auofscil can be created with the following command:
     conda env create -f environment.yml
 
 # Dataset
-Public datasets supporting the experiments can be downloaded at the following links:
+Public datasets supporting the experiments can be downloaded from the following links:
 * CUB_200_2011 [https://www.vision.caltech.edu/datasets/cub_200_2011/]
-* StanforDogs [https://www.kaggle.com/datasets/jessicali9530/stanford-dogs-dataset]
+* Stanford Dogs [https://www.kaggle.com/datasets/jessicali9530/stanford-dogs-dataset]
 
-# Training Script
+# Usage
+The FFCIL training can be performed in three steps. 
+1.  Train the DCL model (https://doi.org/10.1109/CVPR.2019.00530) using the code provided at https://github.com/JDAI-CV/DCL on your chosen dataset (either CUB200 or Stanford Dogs).
+2.  Load the weights from Step 1 (placeholder name: DCLTrainedModelFile.pth) and execute the following command to continue with the remaining pretraining stage:
 
-### CUB200
-* __stage 1__
+           python train.py -project base -dataset datasetName -base_mode 'ft_cos' -new_mode 'avg_cos' -lr_base 0.001 -lr_new 0.1 -decay 0.0005 -epochs_base 100 -schedule Cosine -gpu 0 -temperature 16 -mix 0.5 -model_dir DCLTrainedModelFile.pth -batch_size_base 64 -batch_size_new 512
 
-        python train.py -project base -dataset cub200  -base_mode 'ft_cos' -new_mode 'avg_cos' -gamma 0.1 -lr_base 0.1 -lr_new 0.1 -decay 0.0005 -epochs_base 200 -schedule Cosine -gpu 0,1 -temperature 16 -mix 0.5
-  
-* __stage 2__
+4.  Load the weights from Step 2 (placeholder name: pretrain.pth) and execute the following command below to proceed with pseudo-incremental and incremental stage training.
 
-        python train.py -project cec -dataset cub200 -epochs_base 100 -episode_way 15 -episode_shot 1 -low_way 15 -low_shot 1 -lr_base 0.002 -lrg 0.0002 -step 20 -gamma 0.5 -gpu 0,1 -model_dir /params/cub200_pretrain.pth
+           python train.py -project cec -dataset datasetName -epochs_base 0 -epochs_res 100 -episode_way 5 -episode_shot 1 -low_way 5 -low_shot 1 -episode_query 10 -lr_base 0.002 -lrg 0.001 -step 20 -gpu 0,1 -model_dir params/pretrain.pth
 
-### Stanford Dogs
-* __stage 1__
-
-        python train.py -project base -dataset stanford_dogs  -base_mode 'ft_cos' -new_mode 'avg_cos' -gamma 0.1 -lr_base 0.1 -lr_new 0.1 -decay 0.0005 -epochs_base 200 -schedule Cosine -gpu 0,1 -temperature 16 -mix 0.5
-* __stage 2__
-
-        python train.py -project cec -dataset stanford_dogs -epochs_base 100 -episode_way 15 -episode_shot 1 -low_way 15 -low_shot 1 -lr_base 0.002 -lrg 0.0002 -step 20 -gamma 0.5 -gpu 0,1 -model_dir /params/stanford_dogs_pretrain.pth
-
-### AUO
-* __stage 1__
-
-        python train.py -project base -dataset auo -base_mode 'ft_cos' -new_mode 'avg_cos' -lr_base 0.1 -lr_new 0.1 -decay 0.0005 -epochs_base 200 -schedule Cosine -gpu 0 -temperature 16 -mix 0.5
-
-* __stage 1 DCL__
-
-        python train.py -project base -dataset auo -base_mode 'ft_cos' -new_mode 'avg_cos' -lr_base 0.001 -lr_new 0.1 -decay 0.0005 -epochs_base 100 -schedule Cosine -gpu 0 -temperature 16 -mix 0.5 -model_dir params/resnet18_dcl_15c_cosine_AsoftLinear.pth -batch_size_base 64 -batch_size_new 512
-
-* __stage 2__
-
-        python train.py -project cec -dataset auo -epochs_base 0 -epochs_res 100 -episode_way 5 -episode_shot 1 -low_way 5 -low_shot 1 -episode_query 10 -lr_base 0.002 -lrg 0.001 -step 20 -gpu 0,1 -model_dir params/auo_pretrain.pth
-
-
+#### Please note that the datasetName __MUST__ be replaced with either cub200 or stanford_dogs ####
 
 
 
