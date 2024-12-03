@@ -11,7 +11,7 @@ Public datasets supporting the experiments can be downloaded from the following 
 * CUB_200_2011 [https://www.vision.caltech.edu/datasets/cub_200_2011/]
 * Stanford Dogs [https://www.kaggle.com/datasets/jessicali9530/stanford-dogs-dataset]
 
-# Usage
+# Training
 The FFCIL training can be performed in three steps. 
 1.  Train the DCL model (https://doi.org/10.1109/CVPR.2019.00530) using the code provided at https://github.com/JDAI-CV/DCL on your chosen dataset (either CUB200 or Stanford Dogs).
 2.  Load the weights from Step 1 (placeholder name: DCLTrainedModelFile.pth) and execute the following command to continue with the remaining pretraining stage:
@@ -22,11 +22,21 @@ The FFCIL training can be performed in three steps.
 
            python train.py -project cec -dataset datasetName -epochs_base 0 -epochs_res 100 -episode_way 5 -episode_shot 1 -low_way 5 -low_shot 1 -episode_query 10 -lr_base 0.002 -lrg 0.001 -step 20 -gpu 0,1 -model_dir params/pretrain.pth
 
-#### Please note that the datasetName __MUST__ be replaced with either cub200 or stanford_dogs ####
+#### Please note that the `datasetName` __MUST__ be replaced with either cub200 or stanford_dogs ####
 
+# Testing
+The FFCIL testing is integrated into the code for Step 4, which involves calculating the testing data for each task.
+The testing phase provides accuracy metrics for each task, including:
+* `all_acc` (equivalent to _acc<sub>all</sub>_), which measures the accuracy across all classes within a task
+* `base_acc` (equivalent to _acc<sub>prm</sub>_) which measures the accuracy of the classes from previous task
+* `new_acc` (equivalent to _acc<sub>add</sub>_) which measures the accuracy of the new classes introduced in the current task
 
-
-
-
+# Files
+There are three main folders in this project.
+* `data/index_list` contains the indices of image files for each tasks across all datasets.
+* `dataloader` contains the image loading and preprocessing for both training and testing phases.
+* `model` contains the main function for managing the training and testing processes. It includes the following subfolders:
+    * `base` handles the pretraining stage.
+    * `cec` handles both pseudo-incremental and incremental learning stages.
 
 
