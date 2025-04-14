@@ -1,5 +1,5 @@
 # FFCIL
-This repository contains the code release for the FFCIL paper titled Fine-grained Few-shot Class Incremental Learning with Destruction-construction Integration for Electronic Display Defect Detection [link].
+This repository contains the code release for the FFCIL paper titled FFCIL: Fine-grained Few-shot Class Incremental Learning with Destruction-Construction Learning for TFT-LCD Defect Classification [link].
 
 # Environment
 A conda environment named auofscil can be created with the following command:
